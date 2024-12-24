@@ -1,3 +1,6 @@
+#include <WinAPI.au3>
+#include <File.au3>
+
 If $CmdLine[0] >= 1 Then
     Local $command = StringLower($CmdLine[1])
 
@@ -22,6 +25,9 @@ If $CmdLine[0] >= 1 Then
                 MsgBox(0, "Error", "Usage: scroll amount")
             EndIf
 
+        Case "saveoffset"
+            saveOffset(Number($CmdLine[2]))
+
         Case Else
             MsgBox(0, "Error", "Unknown command: " & $command)
     EndSwitch
@@ -29,6 +35,15 @@ Else
     MsgBox(0, "Error", "No arguments provided.")
 EndIf
 
+Func saveOffset($viewportHeight)
+    Local $sIniFile = @ScriptDir & "\settings.ini"
+    
+    Local $aDesktop = _WinAPI_GetWorkArea()
+    Local $desktopHeight = DllStructGetData($aDesktop, "Bottom") - DllStructGetData($aDesktop, "Top")
+    Local $offsetTop = $viewportHeight - $desktopHeight;
+
+    IniWrite($sIniFile, "Browser", "TopOffset", $offsetTop)
+EndFunc
 
 ; --- Easing Functions ---
 Func __calci1($i, $sm)
@@ -57,6 +72,10 @@ EndFunc
 
 ; --- Main Mouse Move Function ---
 Func mouseMove2($x2, $y2)
+    Local $sIniFile = @ScriptDir & "\settings.ini"
+    Local $offsetTop = IniRead($sIniFile, "Browser", "TopOffset", 0)
+    $y += Int($offsetTop)
+
     Local $x1 = MouseGetPos(0)
     Local $y1 = MouseGetPos(1)
 

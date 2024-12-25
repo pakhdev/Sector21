@@ -22,6 +22,7 @@ import {AiModule} from './ai/ai.module';
                 synchronize: true,
             }),
         }),
+        AiModule,
     ],
 })
 export class AppModule {

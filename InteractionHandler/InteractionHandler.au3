@@ -12,7 +12,7 @@ If $CmdLine[0] >= 1 Then
             If $CmdLine[0] >= 3 Then
                 Local $x = Number($CmdLine[2])
                 Local $y = Number($CmdLine[3])
-                mouseMove($x, $y)
+                mouseMove2($x, $y)
             Else
                 MsgBox(0, "Error", "Usage: move x y")
             EndIf
@@ -35,6 +35,11 @@ Else
     MsgBox(0, "Error", "No arguments provided.")
 EndIf
 
+Func readOffset()
+    Local $sIniFile = @ScriptDir & "\settings.ini"
+    Local $sOffset = IniRead($sIniFile, "Browser", "TopOffset", "0")
+    Return Number($sOffset)
+EndFunc
 Func saveOffset($viewportHeight)
     Local $sIniFile = @ScriptDir & "\settings.ini"
     
@@ -45,57 +50,49 @@ Func saveOffset($viewportHeight)
     IniWrite($sIniFile, "Browser", "TopOffset", $offsetTop)
 EndFunc
 
-; --- Easing Functions ---
 Func __calci1($i, $sm)
-    Return $i ^ $sm
-EndFunc
+    return $i ^ $sm;
+endFunc
 
+; Ease out function
 Func __calci2($i, $sm)
-    Return 1 - ((1 - $i) ^ $sm)
-EndFunc
+    return 1 - ((1 - $i) ^ $sm);
+endFunc
 
+; Ease in out function
 Func __calci($i, $sm)
-    If $i < 0.5 Then
-        Return __calci1($i * 2, $sm) / 2
-    Else
-        Return __calci2(($i - 0.5) * 2, $sm) / 2 + 0.5
-    EndIf
-EndFunc
+    if ($i < 0.5) then
+        return __calci1($i * 2, $sm) / 2;
+    else
+        return (__calci2(($i - 0.5) * 2, $sm) / 2) + 0.5;
+    endIf
+endFunc
 
+; Ease backward function
 Func __calof($i, $sm)
-    If $i < 0.5 Then
-        Return __calci($i * 2, $sm)
-    Else
-        Return __calci((1 - $i) * 2, $sm)
-    EndIf
-EndFunc
+    if ($i < 0.5) then
+        return __calci($i * 2, $sm);
+    else
+        return __calci((1 - $i) * 2, $sm);
+    endIf
+endfunc
 
-; --- Main Mouse Move Function ---
 Func mouseMove2($x2, $y2)
-    Local $sIniFile = @ScriptDir & "\settings.ini"
-    Local $offsetTop = IniRead($sIniFile, "Browser", "TopOffset", 0)
-    $y += Int($offsetTop)
-
-    Local $x1 = MouseGetPos(0)
-    Local $y1 = MouseGetPos(1)
-
-    Local $xv = Random(-80, 80)
-    Local $yv = Random(-80, 80)
-    Local $sm = Random(1.5, 2.5)
-    Local $m = Random(80, 140)
-
-    For $i = 0 To $m
-        Local $t = $i / $m
-        Local $ci = __calci($t, $sm)
-        Local $co = __calof($t, $sm)
-
-        Local $cx = $x1 + (($x2 - $x1) * $ci) + ($xv * $co)
-        Local $cy = $y1 + (($y2 - $y1) * $ci) + ($yv * $co)
-
-        MouseMove($cx, $cy, 0)
-        Sleep(1)
-    Next
-EndFunc
+	$y2 += readOffset();
+    $x1 = mouseGetPos(0);
+    $y1 = mouseGetPos(1);	
+    $xv = random(-100, 100);
+    $yv = random(-100, 100);
+    $sm = random(1.5, 2.5);
+    $m = random(50, 160);
+    for $i = 0 to $m
+        $ci = __calci($i / $m, $sm);
+        $co = __calof($i / $m, $sm);
+        $cx = $x1 + (($x2 - $x1) * $ci) + ($xv * $co);
+        $cy = $y1 + (($y2 - $y1) * $ci) + ($yv * $co);
+        mouseMove ($cx, $cy, 1);
+    next
+endFunc
 
 Func smoothScroll($amount)
 	$stepSize = 266;

@@ -45,7 +45,7 @@ Func saveOffset($viewportHeight)
     
     Local $aDesktop = _WinAPI_GetWorkArea()
     Local $desktopHeight = DllStructGetData($aDesktop, "Bottom") - DllStructGetData($aDesktop, "Top")
-    Local $offsetTop = $viewportHeight - $desktopHeight;
+    Local $offsetTop = $desktopHeight- $viewportHeight;
 
     IniWrite($sIniFile, "Browser", "TopOffset", $offsetTop)
 EndFunc

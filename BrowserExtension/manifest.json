@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Sector21",
+  "version": "0.1",
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://linkedin.com/*"
+  ],
+  "icons": {
+    "16": "icons/sector21_16.png",
+    "32": "icons/sector21_32.png",
+    "128": "icons/sector21_128.png"
+  },
+  "action": {
+    "default_title": "Sector21",
+    "default_icon": {
+      "16": "icons/sector21_16.png",
+      "32": "icons/sector21_32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content.js",
+        "scripts/*.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

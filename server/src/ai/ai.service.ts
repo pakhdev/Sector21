@@ -1,18 +1,14 @@
 import {BodyValidationDto} from "./dto/body-validation.dto";
-import {BodyValidationResponseDto} from "./dto/body-validation-response.dto";
 import {ConfigService} from "@nestjs/config";
-import {HttpService} from "@nestjs/axios";
 import {Injectable} from '@nestjs/common';
 import {LabelsValidationDto} from './dto/labels-validation.dto';
-import {LabelsValidationResponseDto} from "./dto/labels-validation-response.dto";
-import {firstValueFrom} from "rxjs";
 import fetch from 'node-fetch';
+import {LabelsValidationResponseDto} from "./dto/labels-validation-response.dto";
 
 @Injectable()
 export class AiService {
 
     constructor(
-        private readonly httpService: HttpService,
         private configService: ConfigService
     ) {
     }
@@ -20,15 +16,7 @@ export class AiService {
     async validateLabels(labelsValidationDto: LabelsValidationDto): Promise<LabelsValidationResponseDto> {
         const prompt = this.configService.getOrThrow<string>('LABEL_QUERY') + ' ' + JSON.stringify(labelsValidationDto.labels);
         const response = await this.askAi(prompt);
-        const validIds = response === 'NONE' ? [] : this.parseNumberList(response);
-        return {
-            labels: labelsValidationDto.labels.map(label => {
-                return {
-                    ...label,
-                    valid: validIds.includes(label.id),
-                }
-            })
-        }
+        return this.parseJsonInsideBrackets(response);
     }
 
     async validateBody(bodyValidationDto: BodyValidationDto): Promise<string> {
@@ -37,18 +25,15 @@ export class AiService {
         return response;
     }
 
-    private parseNumberList(input: string): number[] {
-        return input
-            .split(',')
-            .map(s => s.trim())
-            .filter(s => s !== '')
-            .map(s => {
-                const num = Number(s);
-                if (isNaN(num)) {
-                    throw new Error(`Value: "${s}" is not a number`);
-                }
-                return num;
-            });
+    private parseJsonInsideBrackets(input: string): LabelsValidationResponseDto {
+        const match = input.match(/\[[\s\S]*\]/);
+        if (!match) throw new Error('No JSON-like structure found in the input string');
+        const jsonText = match[0];
+        try {
+            return JSON.parse(jsonText);
+        } catch (error) {
+            throw new Error(`Failed to parse JSON: ${error}`);
+        }
     }
 
     private async askAi(prompt: string): Promise<string> {

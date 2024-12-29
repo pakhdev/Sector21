@@ -3,7 +3,7 @@ import {Type} from "class-transformer";
 
 class LabelItemDto {
     @IsInt()
-    id: number;
+    remoteId: number;
 
     @IsString()
     name: string;

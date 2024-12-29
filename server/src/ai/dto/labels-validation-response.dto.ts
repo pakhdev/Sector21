@@ -1,7 +1,8 @@
 class ResponseLabelItemDto {
-    id: number;
+    remoteId: number;
     name: string;
-    valid: boolean;
+    isValid: boolean;
+    notValidReason: string;
 }
 
 export class LabelsValidationResponseDto {

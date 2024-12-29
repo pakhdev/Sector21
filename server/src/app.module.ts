@@ -3,6 +3,7 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {AiModule} from './ai/ai.module';
 import { InteractionModule } from './interaction/interaction.module';
+import { EntriesModule } from './entries/entries.module';
 
 @Module({
     imports: [
@@ -25,6 +26,7 @@ import { InteractionModule } from './interaction/interaction.module';
         }),
         AiModule,
         InteractionModule,
+        EntriesModule,
     ],
 })
 export class AppModule {

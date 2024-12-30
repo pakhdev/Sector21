@@ -30,7 +30,7 @@ export class AiService {
         if (!match) throw new Error('No JSON-like structure found in the input string');
         const jsonText = match[0];
         try {
-            return JSON.parse(jsonText);
+            return { labels: JSON.parse(jsonText) };
         } catch (error) {
             throw new Error(`Failed to parse JSON: ${error}`);
         }

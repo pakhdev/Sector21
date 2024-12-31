@@ -16,7 +16,7 @@ export class AiController {
     }
 
     @Post('validate-body')
-    validateBody(@Body() bodyDto: BodyValidationDto): Promise<string> {
+    validateBody(@Body() bodyDto: BodyValidationDto): Promise<BodyValidationResponseDto> {
         return this.aiService.validateBody(bodyDto);
     }
 }

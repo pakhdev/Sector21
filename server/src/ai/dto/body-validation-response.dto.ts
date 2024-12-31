@@ -1,3 +1,4 @@
 export class BodyValidationResponseDto {
-    valid: boolean;
+    isValid: boolean;
+    invalid_reason: string;
 }

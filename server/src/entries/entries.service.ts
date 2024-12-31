@@ -4,6 +4,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Entry} from "./entities/entry.entity";
 import {In, Repository} from "typeorm";
 import {AiService} from "../ai/ai.service";
+import {ValidateDescriptionDto} from "./dto/validate-description.dto";
 
 @Injectable()
 export class EntriesService {
@@ -50,5 +51,15 @@ export class EntriesService {
 
     async findByRemoteIds(ids: number[]): Promise<Entry[]> {
         return await this.entriesRepository.find({ where: {remoteId: In(ids)} });
+    }
+
+    async validateDescription(validateDescriptionDto: ValidateDescriptionDto): Promise<boolean> {
+        const { remoteId, body } = validateDescriptionDto;
+        const { isValid, invalid_reason: notValidReason } = await this.aiService.validateBody(validateDescriptionDto);
+        await this.entriesRepository.update(
+            { remoteId },
+            { isValid, notValidReason, body, isChecked: true }
+        );
+        return isValid;
     }
 }

@@ -1,7 +1,7 @@
 import {Controller, Get, Post, Body, Patch, Param, Delete} from '@nestjs/common';
 import {EntriesService} from './entries.service';
 import {CreateEntriesDto} from './dto/create-entries.dto';
-import {UpdateEntryDto} from './dto/update-entry.dto';
+import {ValidateDescriptionDto} from './dto/validate-description.dto';
 
 @Controller('entries')
 export class EntriesController {
@@ -9,12 +9,12 @@ export class EntriesController {
     }
 
     @Post('create')
-    create(@Body() createEntriesDto: CreateEntriesDto) {
+    create(@Body() createEntriesDto: CreateEntriesDto): Promise<number[]> {
         return this.entriesService.create(createEntriesDto);
     }
 
-    // @Post('validate')
-    // validateDescription(@Body() createEntryDto: CreateEntriesDto) {
-    //     return this.entriesService.validateDescription(createEntryDto);
-    // }
+    @Post('validate-description')
+    validateBody(@Body() validateDescriptionDto: ValidateDescriptionDto): Promise<boolean> {
+        return this.entriesService.validateDescription(validateDescriptionDto);
+    }
 }

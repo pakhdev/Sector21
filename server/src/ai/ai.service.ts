@@ -4,6 +4,7 @@ import {Injectable} from '@nestjs/common';
 import {LabelsValidationDto} from './dto/labels-validation.dto';
 import fetch from 'node-fetch';
 import {LabelsValidationResponseDto} from "./dto/labels-validation-response.dto";
+import {BodyValidationResponseDto} from "./dto/body-validation-response.dto";
 
 @Injectable()
 export class AiService {
@@ -19,10 +20,10 @@ export class AiService {
         return this.parseJsonInsideBrackets(response);
     }
 
-    async validateBody(bodyValidationDto: BodyValidationDto): Promise<string> {
+    async validateBody(bodyValidationDto: BodyValidationDto): Promise<BodyValidationResponseDto> {
         const prompt = this.configService.getOrThrow<string>('BODY_QUERY') + ' ' + bodyValidationDto.body;
         const response = await this.askAi(prompt);
-        return response;
+        return this.parseCompactJsonBlock(response);
     }
 
     private parseJsonInsideBrackets(input: string): LabelsValidationResponseDto {
@@ -31,6 +32,18 @@ export class AiService {
         const jsonText = match[0];
         try {
             return { labels: JSON.parse(jsonText) };
+        } catch (error) {
+            throw new Error(`Failed to parse JSON: ${error}`);
+        }
+    }
+
+    private parseCompactJsonBlock(input: string): BodyValidationResponseDto {
+        const cleaned = input
+            .replace(/^`{3}json\s*/i, '')
+            .replace(/`{3}$/, '')
+            .trim();
+        try {
+            return JSON.parse(cleaned) as BodyValidationResponseDto;
         } catch (error) {
             throw new Error(`Failed to parse JSON: ${error}`);
         }

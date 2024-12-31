@@ -1,6 +1,6 @@
 import {IsInt, IsString} from "class-validator";
 
-export class BodyValidationDto {
+export class ValidateDescriptionDto  {
     @IsInt()
     remoteId: number;
 
